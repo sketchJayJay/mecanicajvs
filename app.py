@@ -537,9 +537,21 @@ def inventory_edit(id):
 @login_required
 def budgets():
     if request.method == "POST":
+        client_id = request.form.get("client_id", "").strip()
+        client = Client.query.get(int(client_id)) if client_id.isdigit() else None
+        if not client:
+            flash("Busque e selecione um cliente válido.", "danger")
+            return redirect(url_for("budgets"))
+
+        vehicle_id = request.form.get("vehicle_id", "").strip()
+        vehicle = Vehicle.query.get(int(vehicle_id)) if vehicle_id.isdigit() else None
+        if vehicle and vehicle.client_id != client.id:
+            flash("O veículo selecionado não pertence ao cliente informado.", "danger")
+            return redirect(url_for("budgets"))
+
         b = Budget(
-            client_id=int(request.form["client_id"]),
-            vehicle_id=int(request.form["vehicle_id"]) if request.form.get("vehicle_id") else None,
+            client_id=client.id,
+            vehicle_id=vehicle.id if vehicle else None,
             notes=request.form.get("notes", "").strip(),
         )
         db.session.add(b)
@@ -622,9 +634,21 @@ def budget_whatsapp(id):
 @login_required
 def orders():
     if request.method == "POST":
+        client_id = request.form.get("client_id", "").strip()
+        client = Client.query.get(int(client_id)) if client_id.isdigit() else None
+        if not client:
+            flash("Busque e selecione um cliente válido.", "danger")
+            return redirect(url_for("orders"))
+
+        vehicle_id = request.form.get("vehicle_id", "").strip()
+        vehicle = Vehicle.query.get(int(vehicle_id)) if vehicle_id.isdigit() else None
+        if vehicle and vehicle.client_id != client.id:
+            flash("O veículo selecionado não pertence ao cliente informado.", "danger")
+            return redirect(url_for("orders"))
+
         o = ServiceOrder(
-            client_id=int(request.form["client_id"]),
-            vehicle_id=int(request.form["vehicle_id"]) if request.form.get("vehicle_id") else None,
+            client_id=client.id,
+            vehicle_id=vehicle.id if vehicle else None,
             problem=request.form.get("problem", "").strip(),
             diagnosis=request.form.get("diagnosis", "").strip(),
             notes=request.form.get("notes", "").strip(),
