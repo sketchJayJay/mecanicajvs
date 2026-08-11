@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#061015">
+  <title>{{ title or 'JVS Mecânica' }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><img src="{{ url_for('static', filename='logo-jvs.png') }}"><div><strong>JVS Mecânica</strong><small>Gestão da oficina</small></div></div>
+  <nav class="nav">
+    <a href="{{ url_for('dashboard') }}">⌂ Dashboard</a>
+    <a href="{{ url_for('clients') }}">👤 Clientes</a>
+    <a href="{{ url_for('vehicles') }}">🚗 Veículos</a>
+    <a href="{{ url_for('inventory') }}">📦 Estoque</a>
+    <a href="{{ url_for('budgets') }}">🧾 Orçamentos</a>
+    <a href="{{ url_for('orders') }}">🔧 Ordens de serviço</a>
+    <a href="{{ url_for('receivables') }}">💰 Contas a receber</a>
+    <a href="{{ url_for('finance') }}">💳 Financeiro</a>
+    <a href="{{ url_for('reports') }}">📊 Relatórios</a>
+    <a href="{{ url_for('company') }}">⚙ Empresa</a>
+  </nav>
+  <div class="sidebar-footer"><a class="btn btn-ghost" style="width:100%" href="{{ url_for('logout') }}">Sair</a></div>
+</aside>
+<main class="content">
+  <div class="topbar no-print">
+    <div style="display:flex;gap:12px;align-items:flex-start">
+      <button class="btn btn-ghost mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+      <div><h1>{{ heading or 'JVS Mecânica' }}</h1><p>{{ subtitle or 'Controle completo da oficina' }}</p></div>
+    </div>
+    <span class="badge">JVS • Oficina Online</span>
+  </div>
+  <div class="flash-wrap">{% with messages=get_flashed_messages(with_categories=true) %}{% for category,message in messages %}<div class="alert alert-{{ category }}">{{ message }}</div>{% endfor %}{% endwith %}</div>
+  {% block content %}{% endblock %}
+</main>
+</div>
+<script>
+document.addEventListener('click',e=>{const s=document.getElementById('sidebar');if(innerWidth<1050&&s.classList.contains('open')&&!s.contains(e.target)&&!e.target.classList.contains('mobile-toggle'))s.classList.remove('open')});
+</script>
+{% block scripts %}{% endblock %}
+</body></html>

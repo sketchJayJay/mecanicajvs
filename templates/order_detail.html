@@ -1,0 +1,36 @@
+{% extends 'base.html' %}{% set heading='OS #' ~ o.id %}{% set subtitle=o.client.name ~ (' • ' ~ o.vehicle.label if o.vehicle else '') %}{% block content %}
+<div class="grid split">
+<section class="card pad">
+  <div class="section-title"><h2>Itens e serviços</h2></div>
+  <div class="toolbar doc-actions">
+    <a class="btn btn-ghost btn-sm" target="_blank" href="{{url_for('order_print',id=o.id)}}">🖨 OS A4</a>
+    <a class="btn btn-ghost btn-sm" target="_blank" href="{{url_for('order_thermal',id=o.id)}}">🧾 OS térmica</a>
+    <a class="btn btn-whatsapp btn-sm" target="_blank" href="{{url_for('order_whatsapp',id=o.id)}}">WhatsApp</a>
+    {% if o.payment_status=='Pago' %}<a class="btn btn-ok btn-sm" target="_blank" href="{{url_for('order_receipt',id=o.id)}}">Recibo</a><a class="btn btn-ok btn-sm" target="_blank" href="{{url_for('order_receipt_thermal',id=o.id)}}">Recibo térmico</a>{% endif %}
+  </div>
+  <div class="muted" style="margin-bottom:14px"><strong>Problema:</strong> {{o.problem or '-'}}<br><strong>Diagnóstico:</strong> {{o.diagnosis or '-'}}<br><strong>Abertura:</strong> {{o.created_at|dt}}{% if o.finished_at %}<br><strong>Conclusão:</strong> {{o.finished_at|dt}}{% endif %}</div>
+  <div class="table-wrap"><table><thead><tr><th>Tipo</th><th>Descrição</th><th>Qtd.</th><th>Unitário</th><th>Total</th></tr></thead><tbody>{% for l in o.lines %}<tr><td>{{l.kind}}</td><td>{{l.description}}</td><td>{{l.qty}}</td><td>{{l.unit_price|brl}}</td><td>{{(l.qty*l.unit_price)|brl}}</td></tr>{% else %}<tr><td colspan="5" class="empty">Nenhum item na OS.</td></tr>{% endfor %}</tbody></table></div>
+  <div class="summary-line"><span class="muted">Total da OS</span><strong>{{o.total|brl}}</strong></div>
+  <hr class="sep">
+  <form method="post" action="{{url_for('order_status',id=o.id)}}" class="toolbar"><select class="select" name="status" style="max-width:220px"><option {{'selected' if o.status=='Aberta'}}>Aberta</option><option {{'selected' if o.status=='Em andamento'}}>Em andamento</option><option {{'selected' if o.status=='Aguardando peça'}}>Aguardando peça</option><option {{'selected' if o.status=='Concluída'}}>Concluída</option></select><button class="btn btn-primary btn-sm">Atualizar status</button><span class="status {{'ok' if o.payment_status=='Pago' else ('warn' if o.payment_status=='Parcial' else 'danger')}}">{{o.payment_status}}</span></form>
+</section>
+<section class="card pad">
+  <div class="section-title"><h2>Adicionar item</h2></div>
+  <form method="post" action="{{url_for('order_add_line',id=o.id)}}" class="form-grid">
+    <div class="field full"><label>Tipo</label><select class="select" name="kind"><option>Serviço</option><option>Peça</option></select></div>
+    <div class="field full"><label>Peça do estoque (opcional)</label><select class="select" name="inventory_item_id" id="oItem"><option value="">Item livre / serviço</option>{% for i in items %}<option value="{{i.id}}" data-price="{{i.price}}" data-name="{{i.name}}">{{i.name}} • saldo {{i.qty}} {{i.unit}}</option>{% endfor %}</select></div>
+    <div class="field full"><label>Descrição</label><input class="input" name="description" id="oDesc"></div><div class="field"><label>Quantidade</label><input class="input" name="qty" type="number" step="0.001" value="1"></div><div class="field"><label>Valor unitário</label><input class="input" name="unit_price" id="oPrice" type="number" step="0.01"></div><div class="full"><button class="btn btn-primary">Adicionar</button></div>
+  </form>
+  <div style="margin-top:18px" class="muted">Ao marcar como <strong>Concluída</strong>, as peças vinculadas são baixadas do estoque automaticamente.</div>
+  <hr class="sep">
+  <div class="section-title"><h2>Pagamento</h2></div>
+  {% if receivable %}
+    <div class="receivable-mini"><span>Conta #{{receivable.id}} • vence {{receivable.due_date|dt}}</span><strong>{{receivable.balance|brl}} em aberto</strong></div>
+    {% if receivable.status!='Pago' %}<a class="btn btn-ghost" style="width:100%;margin-top:10px" href="{{url_for('receivables')}}">Registrar pagamento parcial</a>{% endif %}
+  {% else %}
+    <form method="post" action="{{url_for('order_create_receivable',id=o.id)}}" class="form-grid"><div class="field full"><label>Vencimento da cobrança</label><input class="input" type="date" name="due_date"></div><div class="full"><button class="btn btn-ghost">Gerar conta a receber</button></div></form>
+  {% endif %}
+  {% if o.payment_status!='Pago' %}<form method="post" action="{{url_for('order_pay',id=o.id)}}" style="margin-top:10px"><input type="hidden" name="method" value="PIX"><button class="btn btn-ok" style="width:100%">Marcar como pago agora</button></form>{% endif %}
+</section>
+</div>{% endblock %}
+{% block scripts %}<script>document.getElementById('oItem').addEventListener('change',e=>{let x=e.target.selectedOptions[0];if(x?.value){document.getElementById('oDesc').value=x.dataset.name;document.getElementById('oPrice').value=x.dataset.price}})</script>{% endblock %}
