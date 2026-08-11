@@ -1,0 +1,10 @@
+{% extends 'base.html' %}{% set heading='Recibo da OS #' ~ o.id %}{% set subtitle='Comprovante de quitação' %}{% block content %}
+<section class="card pad receipt-a4">
+  <div class="doc-head"><img src="{{url_for('static',filename='logo-jvs.png')}}"><div class="doc-title"><h1>RECIBO</h1><p>OS nº {{o.id}} • {{o.finished_at|dt if o.finished_at else o.created_at|dt}}</p></div></div>
+  <hr class="sep">
+  <div class="receipt-text">Recebemos de <strong>{{o.client.name}}</strong>{% if o.client.cpf_cnpj %}, CPF/CNPJ {{o.client.cpf_cnpj}}{% endif %}, a quantia de <strong>{{o.total|brl}}</strong>, referente aos serviços e/ou peças da Ordem de Serviço nº <strong>{{o.id}}</strong>{% if o.vehicle %}, veículo <strong>{{o.vehicle.label}}</strong>{% endif %}.</div>
+  <div class="receipt-total"><span>Valor recebido</span><strong>{{o.total|brl}}</strong></div>
+  {% if receivable and receivable.payments %}<div class="muted" style="margin-top:12px">Pagamentos registrados:{% for p in receivable.payments %} {{p.amount|brl}} em {{p.paid_at|dt}} ({{p.method}}){% if not loop.last %};{% endif %}{% endfor %}.</div>{% endif %}
+  <div class="signature-area"><div>________________________________________<br><strong>{{company.name}}</strong><br><span class="muted">{{company.phone}} • {{company.instagram}}</span></div></div>
+  <div class="no-print"><button class="btn btn-primary" onclick="window.print()">Imprimir / Salvar PDF</button></div>
+</section>{% endblock %}

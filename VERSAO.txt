@@ -1,0 +1,12 @@
+JVS Mecânica v2.0
+Atualização: 11/08/2026
+
+Inclui:
+- histórico completo por veículo
+- recibo A4 e térmico 80 mm
+- OS térmica 80 mm
+- WhatsApp para OS e orçamento
+- contas a receber com pagamentos parciais
+- lembretes por KM/data para óleo, correia e manutenção
+- relatório mensal e CSV
+- dashboard ampliado

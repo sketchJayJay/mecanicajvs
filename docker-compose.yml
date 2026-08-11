@@ -1,0 +1,32 @@
+services:
+  web:
+    build: .
+    restart: unless-stopped
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-troque-esta-chave-em-producao}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://jvs:jvs@db:5432/jvs}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@jvs.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+    depends_on:
+      db:
+        condition: service_healthy
+    expose:
+      - "8000"
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-jvs}
+      POSTGRES_USER: ${POSTGRES_USER:-jvs}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-jvs}
+    volumes:
+      - jvs_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-jvs} -d ${POSTGRES_DB:-jvs}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  jvs_postgres:
