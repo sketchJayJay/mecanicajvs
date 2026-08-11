@@ -2,15 +2,15 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#061015">
   <title>{{ title or 'JVS Mecânica' }}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=2.2">
 </head>
 <body>
 <div class="layout">
-<aside class="sidebar" id="sidebar">
-  <div class="brand"><img src="{{ url_for('static', filename='logo-jvs.png') }}"><div><strong>JVS Mecânica</strong><small>Gestão da oficina</small></div></div>
+<aside class="sidebar" id="sidebar" aria-label="Menu principal">
+  <div class="brand"><img src="{{ url_for('static', filename='logo-jvs.png') }}" alt="JVS Mecânica"><div><strong>JVS Mecânica</strong><small>Gestão da oficina</small></div><button type="button" class="mobile-close" id="mobileClose" aria-label="Fechar menu">×</button></div>
   <nav class="nav">
     <a href="{{ url_for('dashboard') }}">⌂ Dashboard</a>
     <a href="{{ url_for('clients') }}">👤 Clientes</a>
@@ -25,11 +25,12 @@
   </nav>
   <div class="sidebar-footer"><a class="btn btn-ghost" style="width:100%" href="{{ url_for('logout') }}">Sair</a></div>
 </aside>
+<div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
 <main class="content">
   <div class="topbar no-print">
-    <div style="display:flex;gap:12px;align-items:flex-start">
-      <button class="btn btn-ghost mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
-      <div><h1>{{ heading or 'JVS Mecânica' }}</h1><p>{{ subtitle or 'Controle completo da oficina' }}</p></div>
+    <div class="topbar-main">
+      <button type="button" class="btn btn-ghost mobile-toggle" id="mobileToggle" aria-label="Abrir menu" aria-controls="sidebar" aria-expanded="false">☰</button>
+      <div class="topbar-copy"><h1>{{ heading or 'JVS Mecânica' }}</h1><p>{{ subtitle or 'Controle completo da oficina' }}</p></div>
     </div>
     <span class="badge">JVS • Oficina Online</span>
   </div>
@@ -38,7 +39,46 @@
 </main>
 </div>
 <script>
-document.addEventListener('click',e=>{const s=document.getElementById('sidebar');if(innerWidth<1050&&s.classList.contains('open')&&!s.contains(e.target)&&!e.target.classList.contains('mobile-toggle'))s.classList.remove('open')});
+(() => {
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('mobileToggle');
+  const close = document.getElementById('mobileClose');
+  const backdrop = document.getElementById('sidebarBackdrop');
+
+  const setMenu = open => {
+    if (!sidebar) return;
+    sidebar.classList.toggle('open', open);
+    document.body.classList.toggle('menu-open', open);
+    if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+
+  toggle?.addEventListener('click', () => setMenu(!sidebar.classList.contains('open')));
+  close?.addEventListener('click', () => setMenu(false));
+  backdrop?.addEventListener('click', () => setMenu(false));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+  sidebar?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => { if (innerWidth <= 1050) setMenu(false); }));
+  window.addEventListener('resize', () => { if (innerWidth > 1050) setMenu(false); });
+
+  // Marca automaticamente cada célula com o título da coluna. No celular,
+  // as tabelas viram cartões legíveis sem rolagem horizontal.
+  document.querySelectorAll('.table-wrap table').forEach(table => {
+    const labels = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
+    table.querySelectorAll('tbody tr').forEach(row => {
+      const cells = [...row.querySelectorAll(':scope > td')];
+      if (cells.length === 1 && Number(cells[0].getAttribute('colspan') || 1) > 1) {
+        cells[0].classList.add('mobile-empty-row');
+        return;
+      }
+      cells.forEach((cell, index) => {
+        if (!cell.hasAttribute('data-label')) cell.setAttribute('data-label', labels[index] || '');
+      });
+    });
+  });
+
+  // Teclados mais adequados no celular.
+  document.querySelectorAll('input[name="phone"]').forEach(i => { i.type = 'tel'; i.inputMode = 'tel'; });
+  document.querySelectorAll('input[name="cpf_cnpj"]').forEach(i => { i.inputMode = 'numeric'; });
+})();
 </script>
 {% block scripts %}{% endblock %}
 </body></html>
