@@ -128,3 +128,14 @@ html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}body{overflow-x:hidden
 }
 
 @media print{.sidebar-backdrop,.mobile-close{display:none!important}}
+
+/* JVS v2.3 - edição de veículos */
+.vehicle-actions{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap}
+.edit-actions{display:flex;gap:10px;align-items:center}
+.edit-actions .btn{width:auto}
+@media(max-width:620px){
+  .vehicle-actions{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  .vehicle-actions .btn{width:100%}
+  .edit-actions{display:grid;grid-template-columns:1fr}
+  .edit-actions .btn{width:100%}
+}

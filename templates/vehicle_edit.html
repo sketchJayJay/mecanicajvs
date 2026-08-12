@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% set heading='Editar veículo' %}
+{% set subtitle='Corrija o nome/modelo ou outros dados cadastrados' %}
+{% block content %}
+<section class="card pad" style="max-width:900px">
+  <div class="section-title">
+    <div>
+      <h2>Editar veículo</h2>
+      <div class="muted">{{ v.label }}</div>
+    </div>
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('vehicle_detail', id=v.id) }}">Voltar</a>
+  </div>
+
+  <form method="post" class="form-grid">
+    <div class="field full">
+      <label>Cliente *</label>
+      <select class="select" name="client_id" required>
+        {% for c in clients %}<option value="{{ c.id }}" {% if c.id == v.client_id %}selected{% endif %}>{{ c.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field"><label>Placa</label><input class="input" name="plate" value="{{ v.plate or '' }}" autocomplete="off"></div>
+    <div class="field"><label>Marca</label><input class="input" name="brand" value="{{ v.brand or '' }}" autocomplete="off"></div>
+    <div class="field full"><label>Nome / modelo do veículo *</label><input class="input" name="model" value="{{ v.model }}" required autofocus></div>
+    <div class="field"><label>Ano</label><input class="input" name="year" value="{{ v.year or '' }}"></div>
+    <div class="field"><label>Cor</label><input class="input" name="color" value="{{ v.color or '' }}"></div>
+    <div class="field full"><label>KM atual</label><input class="input" type="number" name="km" min="0" value="{{ v.km if v.km is not none else '' }}" inputmode="numeric"></div>
+    <div class="field full"><label>Observações</label><textarea class="textarea" name="notes">{{ v.notes or '' }}</textarea></div>
+    <div class="full edit-actions">
+      <button class="btn btn-primary" type="submit">Salvar alterações</button>
+      <a class="btn btn-ghost" href="{{ url_for('vehicle_detail', id=v.id) }}">Cancelar</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

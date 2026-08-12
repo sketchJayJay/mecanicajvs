@@ -1,4 +1,5 @@
 {% extends 'base.html' %}{% set heading=v.label %}{% set subtitle='Histórico completo do veículo' %}{% block content %}
+<div class="doc-actions no-print"><a class="btn btn-primary" href="{{url_for('vehicle_edit',id=v.id)}}">✏️ Editar veículo</a></div>
 <div class="grid vehicle-summary">
   <section class="card pad"><span class="muted">Cliente</span><strong class="big-line">{{v.client.name}}</strong><div>{{v.client.phone or '-'}}</div></section>
   <section class="card pad"><span class="muted">KM atual</span><strong class="big-line">{{v.km or '-'}}{% if v.km %} km{% endif %}</strong><form method="post" action="{{url_for('vehicle_km',id=v.id)}}" class="inline-form"><input class="input" type="number" min="0" name="km" placeholder="Novo KM"><button class="btn btn-primary btn-sm">Atualizar</button></form></section>

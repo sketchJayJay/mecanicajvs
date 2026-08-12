@@ -1,15 +1,10 @@
-JVS Mecânica v2.2
-Atualização: 11/08/2026
+JVS Mecânica v2.3
+Atualização: 12/08/2026
 
-Inclui tudo da v2.1 e melhorias fortes para celular:
-- menu lateral mobile com fundo escurecido e botão de fechar
-- cabeçalho fixo e compacto no celular
-- tabelas convertidas automaticamente em cartões no mobile
-- formulários com campos maiores e teclado adequado no celular
-- botões e áreas de toque maiores
-- dashboard em grade compacta para aproveitar melhor a tela
-- ações rápidas otimizadas para toque
-- buscas de cliente adaptadas ao teclado e à tela pequena
-- janelas de recebimento e busca ajustadas para não sumirem atrás do teclado
-- suporte a safe area de iPhone
-- ajustes gerais para evitar zoom involuntário e rolagem horizontal
+Inclui tudo da v2.2 e adiciona edição de veículos:
+- botão Editar na lista de veículos
+- botão Editar veículo no histórico do veículo
+- correção do nome/modelo salvo incorretamente
+- edição de cliente, placa, marca, ano, cor, KM e observações
+- tela de edição responsiva para celular
+- nenhuma alteração de banco de dados necessária

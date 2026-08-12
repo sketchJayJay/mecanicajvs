@@ -423,6 +423,43 @@ def vehicles():
     return render_template("vehicles.html", vehicles=query.order_by(Vehicle.id.desc()).all(), clients=Client.query.order_by(Client.name).all(), q=q)
 
 
+@app.route("/veiculos/<int:id>/editar", methods=["GET", "POST"])
+@login_required
+def vehicle_edit(id):
+    v = Vehicle.query.get_or_404(id)
+    if request.method == "POST":
+        model = request.form.get("model", "").strip()
+        if not model:
+            flash("Informe o nome/modelo do veículo.", "danger")
+            return render_template(
+                "vehicle_edit.html",
+                v=v,
+                clients=Client.query.order_by(Client.name).all(),
+            )
+
+        client_id = request.form.get("client_id", type=int)
+        if client_id and Client.query.get(client_id):
+            v.client_id = client_id
+
+        v.plate = request.form.get("plate", "").upper().strip()
+        v.brand = request.form.get("brand", "").strip()
+        v.model = model
+        v.year = request.form.get("year", "").strip()
+        v.color = request.form.get("color", "").strip()
+        km_raw = request.form.get("km", "").strip()
+        v.km = int(km_raw) if km_raw else None
+        v.notes = request.form.get("notes", "").strip()
+        db.session.commit()
+        flash("Veículo atualizado com sucesso.", "success")
+        return redirect(url_for("vehicle_detail", id=v.id))
+
+    return render_template(
+        "vehicle_edit.html",
+        v=v,
+        clients=Client.query.order_by(Client.name).all(),
+    )
+
+
 @app.route("/veiculos/<int:id>")
 @login_required
 def vehicle_detail(id):

@@ -7,7 +7,7 @@ Sistema web responsivo para a **JVS Mecânica**, preparado para deploy no **Cool
 - Login administrativo
 - Dashboard com indicadores da oficina
 - Cadastro e busca de clientes
-- Cadastro de veículos com placa, KM e observações
+- Cadastro e edição de veículos com nome/modelo, placa, KM e observações
 - **Histórico completo por veículo**
   - Ordens de serviço anteriores
   - Orçamentos do veículo
