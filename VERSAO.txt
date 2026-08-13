@@ -1,10 +1,10 @@
-JVS Mecânica v2.3
+JVS Mecânica v2.4
 Atualização: 12/08/2026
 
-Inclui tudo da v2.2 e adiciona edição de veículos:
-- botão Editar na lista de veículos
-- botão Editar veículo no histórico do veículo
-- correção do nome/modelo salvo incorretamente
-- edição de cliente, placa, marca, ano, cor, KM e observações
-- tela de edição responsiva para celular
-- nenhuma alteração de banco de dados necessária
+Inclui tudo da v2.3 e melhora a tela de Orçamentos:
+- botão Abrir visível em cada orçamento
+- botão Imprimir direto na listagem
+- linha inteira clicável no computador
+- ações grandes e organizadas no celular
+- orçamento continua abrindo na tela de detalhes já existente
+- nenhuma alteração no banco de dados necessária
