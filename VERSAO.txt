@@ -1,1 +1,1 @@
-2.5 - Busca de OS + editar/excluir ordens salvas
+2.6 - Excluir orçamentos salvos

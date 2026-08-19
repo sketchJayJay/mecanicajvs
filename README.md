@@ -151,3 +151,12 @@ Esta é a versão ampliada da JVS Mecânica com histórico do veículo, recibos,
 - Tela para editar cliente, veículo, problema, diagnóstico e observações da OS.
 - Exclusão de OS preservando lançamentos financeiros já existentes.
 - Nenhuma alteração de estrutura do banco de dados é necessária nesta atualização.
+
+
+## Atualização v2.6
+- Botão Excluir em cada orçamento salvo.
+- Opção Excluir orçamento também dentro da tela de detalhes.
+- Confirmação antes da exclusão para evitar apagamentos acidentais.
+- Ao excluir um orçamento aprovado, a OS já criada é preservada.
+- Itens do orçamento são excluídos junto com o orçamento.
+- Nenhuma alteração de estrutura do banco de dados é necessária nesta atualização.

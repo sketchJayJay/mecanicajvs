@@ -609,6 +609,20 @@ def budget_detail(id):
     return render_template("budget_detail.html", b=b, items=InventoryItem.query.order_by(InventoryItem.name).all())
 
 
+@app.route("/orcamentos/<int:id>/excluir", methods=["POST"])
+@login_required
+def budget_delete(id):
+    b = Budget.query.get_or_404(id)
+    was_approved = b.status == "Aprovado"
+    db.session.delete(b)
+    db.session.commit()
+    if was_approved:
+        flash(f"Orçamento #{id} excluído. A OS criada por ele foi preservada.", "success")
+    else:
+        flash(f"Orçamento #{id} excluído.", "success")
+    return redirect(url_for("budgets"))
+
+
 @app.route("/orcamentos/<int:id>/item", methods=["POST"])
 @login_required
 def budget_add_line(id):

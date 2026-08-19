@@ -168,3 +168,16 @@ html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}body{overflow-x:hidden
   .os-search .search,.os-search .select{grid-column:1/-1!important}
 }
 @media(max-width:420px){.order-actions{grid-template-columns:1fr}}
+
+
+/* JVS v2.6 - exclusão de orçamentos */
+.budget-actions form,.budget-detail-actions form{margin:0}.budget-detail-actions{justify-content:flex-end}
+@media(max-width:760px){
+  .budget-actions{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .budget-actions form{display:block;width:100%}
+  .budget-actions form .btn{width:100%!important}
+  .budget-detail-actions{display:grid;grid-template-columns:1fr 1fr;width:100%;margin-top:10px}
+  .budget-detail-actions form{width:100%}
+  .budget-detail-actions .btn{width:100%!important}
+}
+@media(max-width:420px){.budget-actions,.budget-detail-actions{grid-template-columns:1fr}}

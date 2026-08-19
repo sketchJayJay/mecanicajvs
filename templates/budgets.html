@@ -30,6 +30,9 @@
               <div class="budget-actions">
                 <a class="btn btn-primary btn-sm" href="{{ url_for('budget_detail', id=b.id) }}" aria-label="Abrir orçamento {{ b.id }}">🧾 Abrir</a>
                 <a class="btn btn-ghost btn-sm" target="_blank" href="{{ url_for('budget_print', id=b.id) }}" aria-label="Imprimir orçamento {{ b.id }}">Imprimir</a>
+                <form method="post" action="{{ url_for('budget_delete', id=b.id) }}" onsubmit="return confirm('Excluir o orçamento #{{b.id}}? Essa ação não pode ser desfeita.{% if b.status == 'Aprovado' %} A OS criada por este orçamento será preservada.{% endif %}');">
+                  <button class="btn btn-danger btn-sm" type="submit" aria-label="Excluir orçamento {{ b.id }}">Excluir</button>
+                </form>
               </div>
             </td>
           </tr>
