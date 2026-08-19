@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% set heading='Editar OS #' ~ o.id %}
+{% set subtitle='Corrija os dados da ordem de serviço já salva' %}
+{% block content %}
+<section class="card pad" style="max-width:900px">
+  <div class="section-title">
+    <div>
+      <h2>Dados da OS #{{ o.id }}</h2>
+      <div class="muted">Aberta em {{ o.created_at|dt }}</div>
+    </div>
+    <a class="btn btn-ghost btn-sm" href="{{ url_for('order_detail', id=o.id) }}">Voltar</a>
+  </div>
+
+  <form method="post" class="form-grid">
+    <div class="field full">
+      <label>Cliente *</label>
+      <div class="client-search" data-client-search data-vehicle-target="editOrderVehicle">
+        <input class="input" type="search" value="{{ o.client.name }}" placeholder="Buscar por nome, telefone ou CPF/CNPJ..." autocomplete="off" data-client-input>
+        <input type="hidden" name="client_id" value="{{ o.client_id }}" data-client-id>
+        <div class="client-search-results" data-client-results>
+          {% for c in clients %}
+          <button type="button" class="client-search-option" data-client-option data-id="{{c.id}}" data-label="{{c.name}}" data-search="{{c.name}} {{c.phone}} {{c.cpf_cnpj}}">
+            <strong>{{c.name}}</strong>
+            <small>{% if c.phone %}{{c.phone}}{% endif %}{% if c.phone and c.cpf_cnpj %} • {% endif %}{% if c.cpf_cnpj %}{{c.cpf_cnpj}}{% endif %}</small>
+          </button>
+          {% endfor %}
+          <div class="client-search-empty" data-client-empty hidden>Nenhum cliente encontrado.</div>
+        </div>
+      </div>
+      <small class="field-hint">Se quiser trocar o cliente, pesquise e selecione outro cadastro.</small>
+    </div>
+
+    <div class="field full">
+      <label>Veículo</label>
+      <select class="select" name="vehicle_id" id="editOrderVehicle">
+        <option value="">Sem veículo</option>
+        {% for v in vehicles %}<option data-client="{{v.client_id}}" value="{{v.id}}" {% if o.vehicle_id==v.id %}selected{% endif %}>{{v.client.name}} • {{v.label}}</option>{% endfor %}
+      </select>
+    </div>
+
+    <div class="field full"><label>Problema relatado</label><textarea class="textarea" name="problem">{{ o.problem or '' }}</textarea></div>
+    <div class="field full"><label>Diagnóstico</label><textarea class="textarea" name="diagnosis">{{ o.diagnosis or '' }}</textarea></div>
+    <div class="field full"><label>Observações</label><textarea class="textarea" name="notes">{{ o.notes or '' }}</textarea></div>
+
+    <div class="full edit-actions">
+      <button class="btn btn-primary" type="submit">Salvar alterações</button>
+      <a class="btn btn-ghost" href="{{ url_for('order_detail', id=o.id) }}">Cancelar</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='client-search.js') }}"></script>{% endblock %}

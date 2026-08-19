@@ -1,1 +1,107 @@
-{% extends 'base.html' %}{% set heading='Ordens de serviço' %}{% set subtitle='Da entrada do veículo ao recebimento' %}{% block content %}<div class="grid split"><section class="card pad"><div class="table-wrap"><table><thead><tr><th>OS</th><th>Data</th><th>Cliente</th><th>Veículo</th><th>Status</th><th>Pagamento</th><th>Total</th></tr></thead><tbody>{% for o in orders %}<tr><td><a href="{{url_for('order_detail',id=o.id)}}"><strong>#{{o.id}}</strong></a></td><td>{{o.created_at|dt}}</td><td>{{o.client.name}}</td><td>{{o.vehicle.label if o.vehicle else '-'}}</td><td><span class="status {{'ok' if o.status=='Concluída' else 'warn'}}">{{o.status}}</span></td><td><span class="status {{'ok' if o.payment_status=='Pago' else 'warn'}}">{{o.payment_status}}</span></td><td>{{o.total|brl}}</td></tr>{% else %}<tr><td colspan="7" class="empty">Nenhuma OS.</td></tr>{% endfor %}</tbody></table></div></section><section class="card pad"><div class="section-title"><h2>Nova OS</h2></div><form method="post" class="form-grid"><div class="field full"><label>Cliente *</label><div class="client-search" data-client-search data-vehicle-target="orderVehicle"><input class="input" id="orderClientSearch" type="search" placeholder="Buscar por nome, telefone ou CPF/CNPJ..." autocomplete="off" data-client-input><input type="hidden" name="client_id" id="orderClient" data-client-id><div class="client-search-results" data-client-results>{% for c in clients %}<button type="button" class="client-search-option" data-client-option data-id="{{c.id}}" data-label="{{c.name}}" data-search="{{c.name}} {{c.phone}} {{c.cpf_cnpj}}"><strong>{{c.name}}</strong><small>{% if c.phone %}{{c.phone}}{% endif %}{% if c.phone and c.cpf_cnpj %} • {% endif %}{% if c.cpf_cnpj %}{{c.cpf_cnpj}}{% endif %}</small></button>{% endfor %}<div class="client-search-empty" data-client-empty hidden>Nenhum cliente encontrado.</div></div></div><small class="field-hint">Digite parte do nome, telefone ou CPF/CNPJ e selecione o cliente.</small></div><div class="field full"><label>Veículo</label><select class="select" name="vehicle_id" id="orderVehicle"><option value="">Sem veículo</option>{% for v in vehicles %}<option data-client="{{v.client_id}}" value="{{v.id}}">{{v.client.name}} • {{v.label}}</option>{% endfor %}</select></div><div class="field full"><label>Problema relatado</label><textarea class="textarea" name="problem"></textarea></div><div class="field full"><label>Diagnóstico inicial</label><textarea class="textarea" name="diagnosis"></textarea></div><div class="field full"><label>Observações</label><textarea class="textarea" name="notes"></textarea></div><div class="full"><button class="btn btn-primary">Abrir OS</button></div></form></section></div>{% endblock %}{% block scripts %}<script src="{{ url_for('static', filename='client-search.js') }}"></script>{% endblock %}
+{% extends 'base.html' %}
+{% set heading='Ordens de serviço' %}
+{% set subtitle='Pesquise, abra, edite ou exclua as OS já salvas' %}
+{% block content %}
+<div class="grid split">
+  <section class="card pad">
+    <div class="section-title">
+      <div>
+        <h2>OS salvas</h2>
+        <div class="muted">{{ orders|length }} resultado{% if orders|length != 1 %}s{% endif %}</div>
+      </div>
+    </div>
+
+    <form class="toolbar os-search" method="get">
+      <input class="input search" name="q" value="{{ q }}" placeholder="Buscar Nº da OS, cliente, placa ou veículo..." autocomplete="off">
+      <select class="select" name="status" style="max-width:190px">
+        <option value="">Todos os status</option>
+        <option value="Aberta" {% if status=='Aberta' %}selected{% endif %}>Aberta</option>
+        <option value="Em andamento" {% if status=='Em andamento' %}selected{% endif %}>Em andamento</option>
+        <option value="Aguardando peça" {% if status=='Aguardando peça' %}selected{% endif %}>Aguardando peça</option>
+        <option value="Concluída" {% if status=='Concluída' %}selected{% endif %}>Concluída</option>
+      </select>
+      <button class="btn btn-primary" type="submit">Buscar</button>
+      {% if q or status %}<a class="btn btn-ghost" href="{{ url_for('orders') }}">Limpar</a>{% endif %}
+    </form>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>OS</th><th>Data</th><th>Cliente</th><th>Veículo</th><th>Status</th><th>Pagamento</th><th>Total</th><th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for o in orders %}
+          <tr class="order-row" data-order-url="{{ url_for('order_detail', id=o.id) }}">
+            <td data-label="OS"><a class="order-number" href="{{ url_for('order_detail',id=o.id) }}"><strong>#{{o.id}}</strong></a></td>
+            <td data-label="Data">{{o.created_at|dt}}</td>
+            <td data-label="Cliente"><strong>{{o.client.name}}</strong>{% if o.client.phone %}<div class="muted">{{o.client.phone}}</div>{% endif %}</td>
+            <td data-label="Veículo">{% if o.vehicle %}{{o.vehicle.brand}} {{o.vehicle.model}}{% if o.vehicle.plate %}<div class="muted">{{o.vehicle.plate}}</div>{% endif %}{% else %}-{% endif %}</td>
+            <td data-label="Status"><span class="status {{'ok' if o.status=='Concluída' else 'warn'}}">{{o.status}}</span></td>
+            <td data-label="Pagamento"><span class="status {{'ok' if o.payment_status=='Pago' else ('warn' if o.payment_status=='Parcial' else 'danger')}}">{{o.payment_status}}</span></td>
+            <td data-label="Total"><strong>{{o.total|brl}}</strong></td>
+            <td data-label="Ações">
+              <div class="order-actions">
+                <a class="btn btn-primary btn-sm" href="{{ url_for('order_detail', id=o.id) }}">Abrir</a>
+                <a class="btn btn-ghost btn-sm" href="{{ url_for('order_edit', id=o.id) }}">Editar</a>
+                <form method="post" action="{{ url_for('order_delete', id=o.id) }}" onsubmit="return confirm('Excluir a OS #{{o.id}}? Essa ação não pode ser desfeita. Registros financeiros já lançados serão preservados.');">
+                  <button class="btn btn-danger btn-sm" type="submit">Excluir</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8" class="empty mobile-empty-row">{% if q or status %}Nenhuma OS encontrada com essa busca.{% else %}Nenhuma OS salva ainda.{% endif %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card pad">
+    <div class="section-title"><h2>Nova OS</h2></div>
+    <form method="post" class="form-grid">
+      <div class="field full">
+        <label>Cliente *</label>
+        <div class="client-search" data-client-search data-vehicle-target="orderVehicle">
+          <input class="input" id="orderClientSearch" type="search" placeholder="Buscar por nome, telefone ou CPF/CNPJ..." autocomplete="off" data-client-input>
+          <input type="hidden" name="client_id" id="orderClient" data-client-id>
+          <div class="client-search-results" data-client-results>
+            {% for c in clients %}
+            <button type="button" class="client-search-option" data-client-option data-id="{{c.id}}" data-label="{{c.name}}" data-search="{{c.name}} {{c.phone}} {{c.cpf_cnpj}}">
+              <strong>{{c.name}}</strong>
+              <small>{% if c.phone %}{{c.phone}}{% endif %}{% if c.phone and c.cpf_cnpj %} • {% endif %}{% if c.cpf_cnpj %}{{c.cpf_cnpj}}{% endif %}</small>
+            </button>
+            {% endfor %}
+            <div class="client-search-empty" data-client-empty hidden>Nenhum cliente encontrado.</div>
+          </div>
+        </div>
+        <small class="field-hint">Digite parte do nome, telefone ou CPF/CNPJ e selecione o cliente.</small>
+      </div>
+      <div class="field full">
+        <label>Veículo</label>
+        <select class="select" name="vehicle_id" id="orderVehicle">
+          <option value="">Sem veículo</option>
+          {% for v in vehicles %}<option data-client="{{v.client_id}}" value="{{v.id}}">{{v.client.name}} • {{v.label}}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field full"><label>Problema relatado</label><textarea class="textarea" name="problem"></textarea></div>
+      <div class="field full"><label>Diagnóstico inicial</label><textarea class="textarea" name="diagnosis"></textarea></div>
+      <div class="field full"><label>Observações</label><textarea class="textarea" name="notes"></textarea></div>
+      <div class="full"><button class="btn btn-primary">Abrir OS</button></div>
+    </form>
+  </section>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='client-search.js') }}"></script>
+<script>
+document.querySelectorAll('.order-row').forEach(row => {
+  row.addEventListener('click', event => {
+    if (event.target.closest('a, button, form, input, select, textarea')) return;
+    window.location.href = row.dataset.orderUrl;
+  });
+});
+</script>
+{% endblock %}

@@ -141,3 +141,13 @@ docker compose up --build
 ## Atualização desta versão
 
 Esta é a versão ampliada da JVS Mecânica com histórico do veículo, recibos, impressão térmica, WhatsApp, contas a receber, lembretes de óleo/correia e relatórios mensais.
+
+
+## Atualização v2.5
+- Busca de OS por número, cliente, telefone, placa, marca/modelo, problema ou diagnóstico.
+- Filtro por status da OS.
+- Listagem de OS salvas reorganizada e corrigida para celular.
+- Botões Abrir, Editar e Excluir em cada OS.
+- Tela para editar cliente, veículo, problema, diagnóstico e observações da OS.
+- Exclusão de OS preservando lançamentos financeiros já existentes.
+- Nenhuma alteração de estrutura do banco de dados é necessária nesta atualização.

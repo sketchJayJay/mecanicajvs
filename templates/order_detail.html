@@ -6,6 +6,7 @@
     <a class="btn btn-ghost btn-sm" target="_blank" href="{{url_for('order_print',id=o.id)}}">🖨 OS A4</a>
     <a class="btn btn-ghost btn-sm" target="_blank" href="{{url_for('order_thermal',id=o.id)}}">🧾 OS térmica</a>
     <a class="btn btn-whatsapp btn-sm" target="_blank" href="{{url_for('order_whatsapp',id=o.id)}}">WhatsApp</a>
+    <a class="btn btn-ghost btn-sm" href="{{url_for('order_edit',id=o.id)}}">Editar OS</a>
     {% if o.payment_status=='Pago' %}<a class="btn btn-ok btn-sm" target="_blank" href="{{url_for('order_receipt',id=o.id)}}">Recibo</a><a class="btn btn-ok btn-sm" target="_blank" href="{{url_for('order_receipt_thermal',id=o.id)}}">Recibo térmico</a>{% endif %}
   </div>
   <div class="muted" style="margin-bottom:14px"><strong>Problema:</strong> {{o.problem or '-'}}<br><strong>Diagnóstico:</strong> {{o.diagnosis or '-'}}<br><strong>Abertura:</strong> {{o.created_at|dt}}{% if o.finished_at %}<br><strong>Conclusão:</strong> {{o.finished_at|dt}}{% endif %}</div>
@@ -31,6 +32,8 @@
     <form method="post" action="{{url_for('order_create_receivable',id=o.id)}}" class="form-grid"><div class="field full"><label>Vencimento da cobrança</label><input class="input" type="date" name="due_date"></div><div class="full"><button class="btn btn-ghost">Gerar conta a receber</button></div></form>
   {% endif %}
   {% if o.payment_status!='Pago' %}<form method="post" action="{{url_for('order_pay',id=o.id)}}" style="margin-top:10px"><input type="hidden" name="method" value="PIX"><button class="btn btn-ok" style="width:100%">Marcar como pago agora</button></form>{% endif %}
+  <hr class="sep">
+  <form method="post" action="{{url_for('order_delete',id=o.id)}}" onsubmit="return confirm('Excluir a OS #{{o.id}}? Essa ação não pode ser desfeita. Registros financeiros já lançados serão preservados.');"><button class="btn btn-danger" style="width:100%">Excluir esta OS</button></form>
 </section>
 </div>{% endblock %}
 {% block scripts %}<script>document.getElementById('oItem').addEventListener('change',e=>{let x=e.target.selectedOptions[0];if(x?.value){document.getElementById('oDesc').value=x.dataset.name;document.getElementById('oPrice').value=x.dataset.price}})</script>{% endblock %}

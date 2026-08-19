@@ -1,10 +1,1 @@
-JVS Mecânica v2.4
-Atualização: 12/08/2026
-
-Inclui tudo da v2.3 e melhora a tela de Orçamentos:
-- botão Abrir visível em cada orçamento
-- botão Imprimir direto na listagem
-- linha inteira clicável no computador
-- ações grandes e organizadas no celular
-- orçamento continua abrindo na tela de detalhes já existente
-- nenhuma alteração no banco de dados necessária
+2.5 - Busca de OS + editar/excluir ordens salvas

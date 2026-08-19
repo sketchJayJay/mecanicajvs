@@ -154,3 +154,17 @@ html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}body{overflow-x:hidden
 @media(max-width:380px){
   .budget-actions{grid-template-columns:1fr}
 }
+
+/* JVS v2.5 - busca e gerenciamento das OS */
+.os-search{margin-bottom:14px}.os-search .search{min-width:280px}.order-row{cursor:pointer;transition:background .16s ease}.order-row:hover{background:rgba(0,174,232,.055)}.order-number{color:var(--blue2)}.order-number:hover{text-decoration:underline}.order-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.order-actions form{margin:0}.order-actions .btn{white-space:nowrap}
+@media(max-width:760px){
+  .order-row{cursor:default}
+  .order-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
+  .order-actions form{display:block;width:100%}
+  .order-actions .btn{width:100%!important}
+}
+@media(max-width:620px){
+  .os-search{display:grid;grid-template-columns:1fr 1fr}
+  .os-search .search,.os-search .select{grid-column:1/-1!important}
+}
+@media(max-width:420px){.order-actions{grid-template-columns:1fr}}

@@ -692,13 +692,97 @@ def orders():
         )
         db.session.add(o)
         db.session.commit()
+        flash(f"OS #{o.id} criada com sucesso.", "success")
         return redirect(url_for("order_detail", id=o.id))
+
+    q = request.args.get("q", "").strip()
+    status = request.args.get("status", "").strip()
+    query = ServiceOrder.query.join(Client, ServiceOrder.client_id == Client.id).outerjoin(Vehicle, ServiceOrder.vehicle_id == Vehicle.id)
+
+    if q:
+        term = f"%{q}%"
+        conditions = [
+            Client.name.ilike(term),
+            Client.phone.ilike(term),
+            Vehicle.plate.ilike(term),
+            Vehicle.brand.ilike(term),
+            Vehicle.model.ilike(term),
+            ServiceOrder.problem.ilike(term),
+            ServiceOrder.diagnosis.ilike(term),
+        ]
+        clean_id = q.lstrip("#").strip()
+        if clean_id.isdigit():
+            conditions.append(ServiceOrder.id == int(clean_id))
+        query = query.filter(or_(*conditions))
+
+    if status:
+        query = query.filter(ServiceOrder.status == status)
+
     return render_template(
         "orders.html",
-        orders=ServiceOrder.query.order_by(ServiceOrder.id.desc()).all(),
+        orders=query.order_by(ServiceOrder.id.desc()).all(),
+        clients=Client.query.order_by(Client.name).all(),
+        vehicles=Vehicle.query.order_by(Vehicle.id.desc()).all(),
+        q=q,
+        status=status,
+    )
+
+
+@app.route("/os/<int:id>/editar", methods=["GET", "POST"])
+@login_required
+def order_edit(id):
+    o = ServiceOrder.query.get_or_404(id)
+    if request.method == "POST":
+        client_id = request.form.get("client_id", "").strip()
+        client = Client.query.get(int(client_id)) if client_id.isdigit() else None
+        if not client:
+            flash("Busque e selecione um cliente válido.", "danger")
+            return redirect(url_for("order_edit", id=id))
+
+        vehicle_id = request.form.get("vehicle_id", "").strip()
+        vehicle = Vehicle.query.get(int(vehicle_id)) if vehicle_id.isdigit() else None
+        if vehicle and vehicle.client_id != client.id:
+            flash("O veículo selecionado não pertence ao cliente informado.", "danger")
+            return redirect(url_for("order_edit", id=id))
+
+        o.client_id = client.id
+        o.vehicle_id = vehicle.id if vehicle else None
+        o.problem = request.form.get("problem", "").strip()
+        o.diagnosis = request.form.get("diagnosis", "").strip()
+        o.notes = request.form.get("notes", "").strip()
+
+        receivable = Receivable.query.filter_by(order_id=o.id).first()
+        if receivable:
+            receivable.client_id = client.id
+            receivable.description = f"OS #{o.id} - {client.name}"
+
+        db.session.commit()
+        flash(f"OS #{o.id} atualizada com sucesso.", "success")
+        return redirect(url_for("order_detail", id=o.id))
+
+    return render_template(
+        "order_edit.html",
+        o=o,
         clients=Client.query.order_by(Client.name).all(),
         vehicles=Vehicle.query.order_by(Vehicle.id.desc()).all(),
     )
+
+
+@app.route("/os/<int:id>/excluir", methods=["POST"])
+@login_required
+def order_delete(id):
+    o = ServiceOrder.query.get_or_404(id)
+
+    # Mantém o histórico financeiro, mas remove o vínculo com a OS excluída.
+    receivable = Receivable.query.filter_by(order_id=id).first()
+    if receivable:
+        receivable.order_id = None
+    FinanceEntry.query.filter_by(order_id=id).update({FinanceEntry.order_id: None}, synchronize_session=False)
+
+    db.session.delete(o)
+    db.session.commit()
+    flash(f"OS #{id} excluída.", "success")
+    return redirect(url_for("orders"))
 
 
 @app.route("/os/<int:id>")
