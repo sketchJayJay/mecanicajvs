@@ -47,6 +47,8 @@ Sistema web responsivo para a **JVS Mecânica**, preparado para deploy no **Cool
   - Receitas e despesas
   - Entradas geradas por pagamentos de OS/cobranças
   - Total a receber
+  - Exclusão de lançamentos com confirmação
+  - Exclusão disponível também dentro do relatório mensal
 - **Lembretes de manutenção**
   - Troca de óleo
   - Correia dentada

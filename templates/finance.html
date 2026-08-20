@@ -1,6 +1,39 @@
 {% extends 'base.html' %}{% set heading='Financeiro' %}{% set subtitle='Entradas, saídas e recebimentos da oficina' %}{% block content %}
-<div class="grid kpis" style="grid-template-columns:repeat(4,1fr)"><div class="card pad kpi"><span>Receitas pagas</span><strong class="amount-positive">{{income|brl}}</strong></div><div class="card pad kpi"><span>Despesas pagas</span><strong class="amount-negative">{{expense|brl}}</strong></div><div class="card pad kpi"><span>Saldo</span><strong>{{balance|brl}}</strong></div><div class="card pad kpi"><span>A receber</span><strong>{{receive_total|brl}}</strong><a class="muted small-link" href="{{url_for('receivables')}}">Ver cobranças →</a></div></div>
-<div class="grid split">
-<section class="card pad"><div class="table-wrap"><table><thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Status</th><th>Valor</th></tr></thead><tbody>{% for e in entries %}<tr><td>{{e.due_date|dt}}</td><td>{{e.kind}}</td><td>{{e.description}}</td><td><span class="status {{'ok' if e.paid else 'warn'}}">{{'Pago' if e.paid else 'Pendente'}}</span></td><td class="{{'amount-positive' if e.kind=='Receita' else 'amount-negative'}}">{{e.amount|brl}}</td></tr>{% else %}<tr><td colspan="5" class="empty">Nenhum lançamento.</td></tr>{% endfor %}</tbody></table></div></section>
+<div class="grid kpis" style="grid-template-columns:repeat(4,1fr)">
+  <div class="card pad kpi"><span>Receitas pagas</span><strong class="amount-positive">{{income|brl}}</strong></div>
+  <div class="card pad kpi"><span>Despesas pagas</span><strong class="amount-negative">{{expense|brl}}</strong></div>
+  <div class="card pad kpi"><span>Saldo</span><strong>{{balance|brl}}</strong></div>
+  <div class="card pad kpi"><span>A receber</span><strong>{{receive_total|brl}}</strong><a class="muted small-link" href="{{url_for('receivables')}}">Ver cobranças →</a></div>
+</div>
+<div class="grid split finance-split">
+<section class="card pad">
+  <div class="section-title"><div><h2>Lançamentos</h2><small class="muted">Use o botão vermelho para apagar um lançamento incorreto.</small></div></div>
+  <div class="table-wrap finance-table-wrap">
+    <table class="finance-table">
+      <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Status</th><th>Valor / ação</th></tr></thead>
+      <tbody>
+      {% for e in entries %}
+        <tr>
+          <td data-label="Data">{{e.due_date|dt}}</td>
+          <td data-label="Tipo">{{e.kind}}</td>
+          <td data-label="Descrição">{{e.description}}</td>
+          <td data-label="Status"><span class="status {{'ok' if e.paid else 'warn'}}">{{'Pago' if e.paid else 'Pendente'}}</span></td>
+          <td data-label="Valor / ação">
+            <div class="money-delete-wrap">
+              <strong class="{{'amount-positive' if e.kind=='Receita' else 'amount-negative'}}">{{e.amount|brl}}</strong>
+              <form method="post" action="{{url_for('finance_delete',id=e.id)}}" onsubmit="return confirm('Tem certeza que deseja excluir este lançamento financeiro?');">
+                <input type="hidden" name="source" value="finance">
+                <button class="btn btn-danger btn-sm delete-visible" type="submit">🗑 Excluir</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="empty mobile-empty-row">Nenhum lançamento.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
 <section class="card pad"><div class="section-title"><h2>Novo lançamento</h2></div><form method="post" class="form-grid"><div class="field"><label>Tipo</label><select class="select" name="kind"><option>Receita</option><option>Despesa</option></select></div><div class="field"><label>Data</label><input class="input" type="date" name="due_date"></div><div class="field full"><label>Descrição *</label><input class="input" name="description" required></div><div class="field full"><label>Valor *</label><input class="input" type="number" step="0.01" name="amount" required></div><div class="field full"><label><input type="checkbox" name="paid" checked> Já está pago/recebido</label></div><div class="full"><button class="btn btn-primary">Salvar lançamento</button></div></form></section>
 </div>{% endblock %}

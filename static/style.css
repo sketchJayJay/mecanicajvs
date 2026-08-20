@@ -181,3 +181,16 @@ html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}body{overflow-x:hidden
   .budget-detail-actions .btn{width:100%!important}
 }
 @media(max-width:420px){.budget-actions,.budget-detail-actions{grid-template-columns:1fr}}
+
+
+/* JVS v2.7 - exclusão no financeiro e nos relatórios */
+.report-entries{margin-top:16px}.report-entries form,.table-wrap td form{margin:0}.report-entries .section-title>div{min-width:0}.report-entries .section-title small{display:block;margin-top:5px;line-height:1.4}
+@media(max-width:760px){.report-entries .section-title{align-items:flex-start}.report-entries .table-wrap td[data-label="Ações"]{padding-top:10px}.report-entries .table-wrap td[data-label="Ações"] .btn{width:100%!important}}
+
+/* v2.8 - exclusão financeira sempre visível */
+.finance-table{min-width:650px}
+.money-delete-wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:150px}
+.money-delete-wrap form{margin:0;flex:0 0 auto}
+.delete-visible{white-space:nowrap}
+@media (min-width:761px){.finance-table-wrap{overflow-x:auto}.finance-table th:last-child,.finance-table td:last-child{min-width:185px}.finance-split{grid-template-columns:minmax(0,1.55fr) minmax(300px,.45fr)}}
+@media (max-width:760px){.finance-table{min-width:0}.money-delete-wrap{width:100%;display:grid;grid-template-columns:1fr;gap:8px}.money-delete-wrap strong{text-align:right}.money-delete-wrap .btn{width:100%}}

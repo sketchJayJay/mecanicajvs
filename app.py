@@ -1044,13 +1044,27 @@ def finance():
     return render_template("finance.html", entries=entries, income=income, expense=expense, balance=income-expense, receive_total=receive_total)
 
 
+@app.route("/financeiro/<int:id>/excluir", methods=["POST"])
+@login_required
+def finance_delete(id):
+    entry = FinanceEntry.query.get_or_404(id)
+    source = request.form.get("source", "finance")
+    month = request.form.get("month", "").strip()
+    db.session.delete(entry)
+    db.session.commit()
+    flash("Lançamento financeiro excluído. Os totais foram recalculados.", "success")
+    if source == "reports":
+        return redirect(url_for("reports", mes=month) if month else url_for("reports"))
+    return redirect(url_for("finance"))
+
+
 # ---------- relatórios ----------
 @app.route("/relatorios")
 @login_required
 def reports():
     month = request.args.get("mes") or date.today().strftime("%Y-%m")
     start, end = month_bounds(month)
-    entries = FinanceEntry.query.filter(FinanceEntry.due_date >= start, FinanceEntry.due_date < end, FinanceEntry.paid.is_(True)).all()
+    entries = FinanceEntry.query.filter(FinanceEntry.due_date >= start, FinanceEntry.due_date < end, FinanceEntry.paid.is_(True)).order_by(FinanceEntry.due_date.desc(), FinanceEntry.id.desc()).all()
     revenue = sum((money(e.amount) for e in entries if e.kind == "Receita"), Decimal("0.00"))
     expense = sum((money(e.amount) for e in entries if e.kind == "Despesa"), Decimal("0.00"))
     month_orders = ServiceOrder.query.filter(ServiceOrder.created_at >= datetime.combine(start, datetime.min.time()), ServiceOrder.created_at < datetime.combine(end, datetime.min.time())).all()
@@ -1092,6 +1106,7 @@ def reports():
         paid=paid,
         top_services=top_services,
         top_clients=top_clients,
+        entries=entries,
         chart=chart,
         max_chart=max_chart,
     )

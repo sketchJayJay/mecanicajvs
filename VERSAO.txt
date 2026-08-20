@@ -1,1 +1,1 @@
-2.6 - Excluir orçamentos salvos
+JVS Mecânica v2.8 - exclusão financeira e relatórios corrigida e visível

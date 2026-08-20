@@ -2,5 +2,34 @@
 <form class="toolbar no-print"><div class="field" style="min-width:220px"><label>Mês</label><input class="input" type="month" name="mes" value="{{month}}"></div><button class="btn btn-primary" style="margin-top:18px">Atualizar</button><a class="btn btn-ghost" style="margin-top:18px" href="{{url_for('monthly_csv',mes=month)}}">Exportar CSV</a></form>
 <div class="grid kpis report-kpis"><div class="card pad kpi"><span>Receitas</span><strong class="amount-positive">{{revenue|brl}}</strong></div><div class="card pad kpi"><span>Despesas</span><strong class="amount-negative">{{expense|brl}}</strong></div><div class="card pad kpi"><span>Resultado</span><strong>{{profit|brl}}</strong></div><div class="card pad kpi"><span>OS abertas no mês</span><strong>{{order_count}}</strong><small class="muted">{{completed}} concluídas</small></div><div class="card pad kpi"><span>Total das OS</span><strong>{{billed|brl}}</strong><small class="muted">{{paid}} pagas</small></div></div>
 <section class="card pad report-chart"><div class="section-title"><h2>Movimentação por dia</h2><span class="muted">{{start.strftime('%m/%Y')}}</span></div><div class="bar-chart">{% for x in chart %}<div class="bar-day" title="Dia {{x.day}}: receitas R$ {{'%.2f'|format(x.revenue)}} • despesas R$ {{'%.2f'|format(x.expense)}}"><div class="bar-pair"><i class="bar income" style="height:{{(x.revenue/max_chart*100)|round(1)}}%"></i><i class="bar expense" style="height:{{(x.expense/max_chart*100)|round(1)}}%"></i></div><small>{{x.day}}</small></div>{% endfor %}</div><div class="chart-legend"><span><i class="dot income-dot"></i> Receitas</span><span><i class="dot expense-dot"></i> Despesas</span></div></section>
+
+<section class="card pad report-entries">
+  <div class="section-title"><div><h2>Lançamentos do mês</h2><small class="muted">Você pode excluir um lançamento aqui. Ele também será removido do Financeiro.</small></div></div>
+  <div class="table-wrap finance-table-wrap"><table class="finance-table">
+    <thead><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Valor / ação</th></tr></thead>
+    <tbody>
+    {% for e in entries %}
+      <tr>
+        <td data-label="Data">{{e.due_date|dt}}</td>
+        <td data-label="Tipo">{{e.kind}}</td>
+        <td data-label="Descrição">{{e.description}}</td>
+        <td data-label="Valor / ação">
+          <div class="money-delete-wrap">
+            <strong class="{{'amount-positive' if e.kind=='Receita' else 'amount-negative'}}">{{e.amount|brl}}</strong>
+            <form method="post" action="{{url_for('finance_delete',id=e.id)}}" onsubmit="return confirm('Tem certeza que deseja excluir este lançamento do relatório e do financeiro?');">
+              <input type="hidden" name="source" value="reports">
+              <input type="hidden" name="month" value="{{month}}">
+              <button class="btn btn-danger btn-sm delete-visible" type="submit">🗑 Excluir</button>
+            </form>
+          </div>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="4" class="empty mobile-empty-row">Nenhum lançamento pago neste mês.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</section>
+
 <div class="grid split" style="margin-top:16px"><section class="card pad"><div class="section-title"><h2>Serviços/itens com maior faturamento</h2></div>{% for name,total in top_services %}<div class="rank-row"><span><b>{{loop.index}}</b> {{name}}</span><strong>{{total|brl}}</strong></div>{% else %}<div class="empty">Sem dados no mês.</div>{% endfor %}</section><section class="card pad"><div class="section-title"><h2>Clientes por valor de OS</h2></div>{% for name,total in top_clients %}<div class="rank-row"><span><b>{{loop.index}}</b> {{name}}</span><strong>{{total|brl}}</strong></div>{% else %}<div class="empty">Sem dados no mês.</div>{% endfor %}</section></div>
 {% endblock %}
